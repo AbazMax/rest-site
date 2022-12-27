@@ -1,0 +1,37 @@
+{% extends 'index.html' %}
+
+{% block content %}
+    <section class="text-center">
+    {% if user.is_authenticated %}
+     <li>User: {{ user.get_username }}</li>
+     <li><a href="{% url 'logout'%}?next={{request.path}}">Logout</a></li>
+   {% else %}
+     <li><a href="{% url 'login'%}?next={{request.path}}">Login</a></li>
+   {% endif %}
+    </section>
+
+    <section id="reserves">
+    <div class="container">
+        <div class="col-md-10 col-md-offset-1">
+            {% for item in mes_list %}
+                <div class="row">
+                    <div class="col-md-2">{{ item.date|date:'d-m-Y' }}</div>
+                    <div class="col-md-3"><b>{{ item.name }}</b></div>
+                    <div class="col-md-2">Email {{ item.email }}</div>
+                    <div class="col-md-1">
+                        <a href="{% url 'manager:update_message' pk=item.pk %}">
+                            <button type="button" class="btn book-a-table-btn">Close</button>
+                        </a>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-2"></div>
+                    <div class="col-md-9"><p>Subject: <p>{{ item.subject }}</p></p></div>
+                    <div class="col-md-9"><p>Message: <p>{{ item.message }}</p></p></div>
+                </div>
+            {% endfor %}
+        </div>
+    </div>
+    </section>
+
+{% endblock %}
