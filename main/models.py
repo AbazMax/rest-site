@@ -4,7 +4,19 @@ import os
 from django.core.validators import RegexValidator
 
 
+class UniqueFileName:
+
+    """Mixin class to make uploaded files name unique"""
+
+    def get_file_name(self, filename: str) -> str:
+        """Get file name and change it using uuid"""
+        ext_file = filename.strip().split('.')[-1]
+        new_filename = f'{uuid.uuid4()}.{ext_file}'
+        return os.path.join(self.__class__.__name__, new_filename)
+
+
 class Category(models.Model):
+    """Categories of dishes"""
     name = models.CharField(unique=True, max_length=50, db_index=True)
     position = models.SmallIntegerField(unique=True)
     is_visible = models.BooleanField(default=True)
@@ -17,12 +29,10 @@ class Category(models.Model):
         verbose_name_plural = 'Categories'
 
 
-class Dish(models.Model):
+class Dish(models.Model, UniqueFileName):
 
     def get_file_name(self, filename: str) -> str:
-        ext_file = filename.strip().split('.')[-1]
-        new_filename = f'{uuid.uuid4()}.{ext_file}'
-        return os.path.join('dishes', new_filename)
+        return super().get_file_name(filename)
 
     slug = models.SlugField(max_length=200, db_index=True)
     name = models.CharField(unique=True, max_length=50, db_index=True)
@@ -44,12 +54,10 @@ class Dish(models.Model):
         return f'{self.name}'
 
 
-class Events(models.Model):
+class Events(models.Model, UniqueFileName):
 
     def get_file_name(self, filename: str) -> str:
-        ext_file = filename.strip().split('.')[-1]
-        new_filename = f'{uuid.uuid4()}.{ext_file}'
-        return os.path.join('events', new_filename)
+        return super().get_file_name(filename)
 
     name = models.CharField(unique=True, max_length=100, db_index=True)
     price = models.DecimalField(max_digits=8, decimal_places=0)
@@ -70,12 +78,10 @@ class Events(models.Model):
         return f'{self.name}'
 
 
-class About(models.Model):
+class About(models.Model, UniqueFileName):
 
     def get_file_name(self, filename: str) -> str:
-        ext_file = filename.strip().split('.')[-1]
-        new_filename = f'{uuid.uuid4()}.{ext_file}'
-        return os.path.join('events', new_filename)
+        return super().get_file_name(filename)
 
     title_simple = models.CharField(max_length=50, blank=True, db_index=True)
     title_selected = models.CharField(max_length=50, blank=True, db_index=True)
@@ -108,12 +114,10 @@ class WhyUs(models.Model):
         verbose_name_plural = '"Why us" section'
 
 
-class Gallery(models.Model):
+class Gallery(models.Model, UniqueFileName):
 
     def get_file_name(self, filename: str) -> str:
-        ext_file = filename.strip().split('.')[-1]
-        new_filename = f'{uuid.uuid4()}.{ext_file}'
-        return os.path.join('gallery', new_filename)
+        return super().get_file_name(filename)
 
     photo = models.ImageField(upload_to=get_file_name)
     position = models.SmallIntegerField(unique=True)
@@ -126,12 +130,10 @@ class Gallery(models.Model):
         return f'{self.position}'
 
 
-class Chefs(models.Model):
+class Chefs(models.Model, UniqueFileName):
 
     def get_file_name(self, filename: str) -> str:
-        ext_file = filename.strip().split('.')[-1]
-        new_filename = f'{uuid.uuid4()}.{ext_file}'
-        return os.path.join('gallery', new_filename)
+        return super().get_file_name(filename)
 
     name = models.CharField(max_length=50, db_index=True)
     job_position = models.CharField(max_length=50)
@@ -165,12 +167,10 @@ class Titles(models.Model):
         return f'{self.__class__.__name__}'
 
 
-class Testimonials(models.Model):
+class Testimonials(models.Model, UniqueFileName):
 
     def get_file_name(self, filename: str) -> str:
-        ext_file = filename.strip().split('.')[-1]
-        new_filename = f'{uuid.uuid4()}.{ext_file}'
-        return os.path.join('gallery', new_filename)
+        return super().get_file_name(filename)
 
     name = models.CharField(max_length=100, unique=True)
     profession = models.CharField(max_length=50)
@@ -208,12 +208,10 @@ class OurInformation(models.Model):
         verbose_name_plural = 'Our information'
 
 
-class TopSitePresentation(models.Model):
+class TopSitePresentation(models.Model, UniqueFileName):
 
     def get_file_name(self, filename: str) -> str:
-        ext_file = filename.strip().split('.')[-1]
-        new_filename = f'{uuid.uuid4()}.{ext_file}'
-        return os.path.join('presentation', new_filename)
+        return super().get_file_name(filename)
 
     title = models.CharField(max_length=100, unique=True, db_index=True)
     text = models.TextField(max_length=300, db_index=True)
@@ -259,34 +257,6 @@ class UserMessage(models.Model):
     class Meta:
         ordering = ('-date', '-is_processed')
         verbose_name_plural = 'User messages'
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
     def __str__(self):
         return f'{self.name}, {self.email}: {self.subject[:100]}'
